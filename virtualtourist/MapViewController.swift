@@ -13,12 +13,12 @@ import CoreData
 class MapViewController: UIViewController,MKMapViewDelegate,NSFetchedResultsControllerDelegate {
     var pins = [Pin]()
     var tappedPin: Pin? = nil
-   
+    
     
     @IBOutlet var mainView: UIView!
     @IBOutlet weak var deletelabel: UILabel!
     @IBOutlet weak var map: MKMapView!
-   
+    
     
     var fetchedResultsController : NSFetchedResultsController<NSFetchRequestResult>?{
         didSet{
@@ -40,8 +40,8 @@ class MapViewController: UIViewController,MKMapViewDelegate,NSFetchedResultsCont
         super.viewDidLoad()
         deletelabel.isHidden = true
         // Set bar button item title
-     navigationItem.rightBarButtonItem = editButtonItem
- 
+        navigationItem.rightBarButtonItem = editButtonItem
+        
         // Set delegate
         map.delegate = self
         
@@ -57,10 +57,10 @@ class MapViewController: UIViewController,MKMapViewDelegate,NSFetchedResultsCont
         
         super.setEditing(editing, animated: false)
         if editing {
-        // Show delete message view when editing button is tapped
-        UIView.animate(withDuration: 0.1, animations: {
-            self.deletelabel.isHidden = false
-        })} else {
+            // Show delete message view when editing button is tapped
+            UIView.animate(withDuration: 0.1, animations: {
+                self.deletelabel.isHidden = false
+            })} else {
             self.deletelabel.isHidden = true
         }
         

@@ -14,22 +14,49 @@ class PhotoCollectionViewController: UIViewController,MKMapViewDelegate,UICollec
     var pin: Pin? = nil
     var photosArray = [Photo]()
     var indexToRemove = [IndexPath]()
-    
+    let flickrManager = FlickrNetworkManager()
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
     @IBOutlet weak var newcollectionbutton: UIButton!
     
     
     @IBOutlet weak var collectionlayout: UICollectionViewFlowLayout!
-    let flickrManager = FlickrNetworkManager()
-    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+    
+    
+    @IBOutlet weak var collection: UICollectionView!
+    
+    @IBOutlet weak var mapView: MKMapView!
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Set left bar button item properties
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "OK", style: .plain, target: self, action: #selector(dismissCollectionVC))
+        
+        // Set pin from selected annotation; adjust map positioning
+        mapView.addAnnotation(pin!)
+        mapView.setRegion(MKCoordinateRegion(center: pin!.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)), animated: true)
+        
+        // Set delegate and dataSource
+        collection.delegate = self
+        collection.dataSource = self
+        
+        // Setup collection view cell layout
+        setupCollectionFlowLayout()
+        // collection.backgroundColor = UIColor.gray
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin!)
+        
+    }
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-   return photosArray.count
+        return photosArray.count
     }
     
-   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! PhotoCollectionViewCell
         
         // Cleanup reused cell
@@ -65,38 +92,12 @@ class PhotoCollectionViewController: UIViewController,MKMapViewDelegate,UICollec
                 do { try delegate.stack.saveContext() } catch {
                     print("Error saving photo data")
                 }
-        }
+            }
             
         }
         return cell
     }
     
-    @IBOutlet weak var collection: UICollectionView!
-    
-    @IBOutlet weak var mapView: MKMapView!
-  
-  
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Set left bar button item properties
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "OK", style: .plain, target: self, action: #selector(dismissCollectionVC))
-        
-        // Set pin from selected annotation; adjust map positioning
-        mapView.addAnnotation(pin!)
-        mapView.setRegion(MKCoordinateRegion(center: pin!.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)), animated: true)
-        
-        // Set delegate and dataSource
-        collection.delegate = self
-        collection.dataSource = self
-        
-        // Setup collection view cell layout
-      setupCollectionFlowLayout()
-       // collection.backgroundColor = UIColor.gray
-        
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "id", ascending: true)]
-        fetchRequest.predicate = NSPredicate(format: "pin == %@", self.pin!)
-       
-    }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         let cell = collectionView.cellForItem(at: indexPath) as! PhotoCollectionViewCell
@@ -105,13 +106,13 @@ class PhotoCollectionViewController: UIViewController,MKMapViewDelegate,UICollec
             indexToRemove.remove(at: indexToRemove.index(of: indexPath)!)
             cell.alpha = 1.0
             if indexToRemove.count == 0 {
-               newcollectionbutton.setTitle("New Collection", for: UIControlState())
+                newcollectionbutton.setTitle("New Collection", for: UIControlState())
                 newcollectionbutton.tag = 0
             }
         } else {
             if indexToRemove.count == 0 {
-               newcollectionbutton.setTitle("Remove selected images", for: UIControlState())
-               newcollectionbutton.tag = 1
+                newcollectionbutton.setTitle("Remove selected images", for: UIControlState())
+                newcollectionbutton.tag = 1
             }
             indexToRemove.append(indexPath)
             
@@ -229,16 +230,16 @@ class PhotoCollectionViewController: UIViewController,MKMapViewDelegate,UICollec
         default: break
         }
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
-       photosArray = photosFetchRequest()
-         self.collection.reloadData()
+        photosArray = photosFetchRequest()
+        self.collection.reloadData()
     }
     @objc func dismissCollectionVC() {
         
         navigationController?.popViewController(animated: true)
     }
-   
+    
     func photosFetchRequest() -> [Photo] {
         
         print("Fetching Photos...")
