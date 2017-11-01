@@ -199,7 +199,7 @@ class PhotoCollectionViewController: UIViewController,MKMapViewDelegate,UICollec
             
             deleteAllPhotos()
             
-            FlickrNetworkManager.sharedNetworkManager.getPhotosUsingCoordinates(pin!.lat, long: pin!.long, page: FlickrNetworkManager.sharedNetworkManager.randomPage) { (photos, error) in
+            FlickrNetworkManager.sharedNetworkManager.getPhotosUsingCoordinates(pin!.lat, long: pin!.long, page: FlickrNetworkManager.sharedNetworkManager.randompage) { (photos, error) in
                 
                 DispatchQueue.main.async {
                     
