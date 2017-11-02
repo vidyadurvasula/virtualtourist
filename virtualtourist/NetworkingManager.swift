@@ -182,7 +182,7 @@ class FlickrNetworkManager: NSObject{
                 displayError("Cannot find key '\(Constants.FlickrResponseKeys.Pages)' in \(photodictionary)")
                 return
             }
-            
+            print(totalPages)
             let pageLimit = min(totalPages, 40)
             let randomPagess = Int(arc4random_uniform(UInt32(pageLimit))) + 1
             self.randompage = randomPagess
